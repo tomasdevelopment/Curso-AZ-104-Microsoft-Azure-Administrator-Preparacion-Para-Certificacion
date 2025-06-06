@@ -1,10 +1,9 @@
 # course-azure-container-debug-console-section-03
 
-
-
 # Azure Container Debug Console
 
 This guide helps you debug Azure Container Apps by inspecting configuration, checking environment variables, and installing Azure Functions Core Tools for local debugging inside the container.
+
 
 ## Why use these scripts?
 
@@ -16,6 +15,13 @@ Running these scripts inside your Linux container image helps:
 
 ---
 
+## How to Use This Repo
+
+- Clone or download this repo inside your container environment.
+- Run the shell scripts located in the `/sh` directory using bash:
+  ```bash
+  bash ./sh/inspect-container-root.sh
+  bash ./sh/install-azure-func-tools.sh
 
 ## 0. Access the console Bash and check your function structure & Inspecting the Azure Functions Project Structure
 
