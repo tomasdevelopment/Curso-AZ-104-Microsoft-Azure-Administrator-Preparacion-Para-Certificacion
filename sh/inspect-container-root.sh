@@ -17,3 +17,7 @@ if [ -f /home/site/wwwroot/host.json ]; then
 else
   echo "no host.json"
 fi
+
+# Check your environment Variables
+
+echo $name_of_save_env_var
