@@ -2,3 +2,9 @@
 winget search Microsoft.PowerShell
 #installar via id winget
 winget install --id Microsoft.PowerShell --source winget
+
+<# Opcional/Optional: 
+Instalar preview  / Install preview
+winget install --id Microsoft.PowerShell.Preview --source winget
+
+#>
