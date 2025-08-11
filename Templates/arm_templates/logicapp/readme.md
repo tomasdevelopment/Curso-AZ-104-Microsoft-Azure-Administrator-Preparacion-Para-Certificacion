@@ -11,3 +11,6 @@ WEBSITE_CONTENTOVERVNET=1	Mounts content over VNET (requires private file endpoi
 AzureFunctionsJobHost__extensionBundle__id	Must be Microsoft.Azure.Functions.ExtensionBundle.Workflows.
 AzureFunctionsJobHost__extensionBundle__version	Pin tightly in prod, e.g., "[1.17.*, 1.18.0)". Use [concat('[', '1.*, 2.0.0)')] in ARM.
 <img width="1731" height="430" alt="image" src="https://github.com/user-attachments/assets/34a16ae0-c70f-4ba0-b288-01c9fcbff2c8" />
+
+Architecture
+![logicapps](https://github.com/user-attachments/assets/a2d3690a-9656-469a-aa95-23e18cdc62b4)
