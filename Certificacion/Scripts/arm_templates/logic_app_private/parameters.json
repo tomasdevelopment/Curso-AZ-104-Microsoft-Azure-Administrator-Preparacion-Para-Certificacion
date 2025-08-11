@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": { "value": "pgd-microservices-be" },
+    "location": { "value": "East US 2" },
+
+    "appServicePlanName": { "value": "" },
+    "sku": { "value": "" },
+    "skuCode": { "value": "" },
+
+    "vnetName": { "value": "" },
+    "vnetResourceGroupName": { "value": "" },
+    "subnetName": { "value": "" },
+
+    "fileShareName": { "value": "" },
+
+    "appInsightName": { "value": "" },
+    "contentStorageAccountName": { "value": "" },
+    "contentStorageAccountResourceGroup": {
+      "value": ""
+    },
+    "use32BitWorkerProcess": { "value": false },
+    "enablePrivateEndpoint": { "value": true },
+    "privateEndpointName": { "value": "logicapp-pe" },
+   "privateEndpointSubnetId": { "value": "" },
+    "privateDnsZoneId": { "value": "" },
+"privateEndpointResourceGroupName": { "value": "" },
+"appResourceGroupName": { "value": "" }
+
+  }
+}
+
