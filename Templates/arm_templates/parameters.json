@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "zoneName": {
+      "value": "yourdomain.com"
+    },
+    "zoneTags": {
+      "value": {
+        "project": "yourproject",
+        "owner": "tom",
+        "env": "prod"
+      }
+    },
+    "ttlDefault": {
+      "value": 3600
+    },
+    "ttlNS": {
+      "value": 172800
+    },
+   "aRecords": {
+  "value": []
+}
+,
+    "cnameRecords": {
+      "value": [
+        {
+          "name": "cdnverify",
+          "ttl": 3600,
+          "cname": "cdnverify.staticweb01.azureedge.net"
+        },
+        {
+          "name": "www",
+          "ttl": 3600,
+          "cname": "CHANGEME-your-endpoint-host.zXX.azurefd.net"
+        }
+      ]
+    },
+    "txtRecords": {
+      "value": []
+    },
+    "mxRecords": {
+      "value": []
+    },
+    "aaaaRecords": {
+      "value": []
+    },
+    "childNsRecords": {
+      "value": []
+    },
+    "overrideSOA": {
+      "value": false
+    }
+  }
+}

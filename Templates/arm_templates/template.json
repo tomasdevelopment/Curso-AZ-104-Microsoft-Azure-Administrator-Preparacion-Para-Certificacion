@@ -1,0 +1,274 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "zoneName": {
+      "type": "String",
+      "metadata": {
+        "description": "DNS zone name, e.g., example.com"
+      }
+    },
+    "zoneTags": {
+      "type": "Object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Optional tags for the DNS zone"
+      }
+    },
+    "ttlDefault": {
+      "type": "Int",
+      "defaultValue": 3600
+    },
+    "ttlNS": {
+      "type": "Int",
+      "defaultValue": 172800
+    },
+    "aRecords": {
+      "type": "Array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "A records: [{\"name\":\"@\",\"ttl\":3600,\"ipv4Addresses\":[\"1.2.3.4\"],\"targetResourceId\":null}]  (Provide either ipv4Addresses or targetResourceId)"
+      }
+    },
+    "aaaaRecords": {
+      "type": "Array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "AAAA records: [{\"name\":\"@\",\"ttl\":3600,\"ipv6Addresses\":[\"::1\"],\"targetResourceId\":null}]  (Provide either ipv6Addresses or targetResourceId)"
+      }
+    },
+    "cnameRecords": {
+      "type": "Array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "CNAME records: [{\"name\":\"www\",\"ttl\":3600,\"cname\":\"staticweb01-abc.azurefd.net\"}]"
+      }
+    },
+    "txtRecords": {
+      "type": "Array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "TXT records: [{\"name\":\"@\",\"ttl\":3600,\"values\":[\"MS=ms123\",\"v=spf1 include:spf.protection.outlook.com -all\"]}]"
+      }
+    },
+    "mxRecords": {
+      "type": "Array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "MX records: [{\"name\":\"@\",\"ttl\":3600,\"exchanges\":[{\"preference\":10,\"exchange\":\"mx1.example.com.\"}]}]"
+      }
+    },
+    "childNsRecords": {
+      "type": "Array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Child NS delegations: [{\"name\":\"sub\",\"ttl\":172800,\"nsdnames\":[\"ns1-01.azure-dns.com.\",\"ns2-01.azure-dns.net.\"]}]"
+      }
+    },
+    "overrideSOA": {
+      "type": "Bool",
+      "defaultValue": false
+    },
+    "soaRecord": {
+      "type": "Object",
+      "defaultValue": {
+        "email": "azuredns-hostmaster.microsoft.com",
+        "expireTime": 2419200,
+        "host": "ns1-01.azure-dns.com.",
+        "minimumTTL": 300,
+        "refreshTime": 3600,
+        "retryTime": 300,
+        "serialNumber": 1,
+        "ttl": 3600
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Network/dnszones",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[parameters('zoneName')]",
+      "location": "global",
+      "tags": "[parameters('zoneTags')]",
+      "properties": {
+        "zoneType": "Public"
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnszones/A",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/{1}', parameters('zoneName'), parameters('aRecords')[copyIndex('copyA')].name)]",
+      "copy": {
+        "name": "copyA",
+        "count": "[length(parameters('aRecords'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[if(contains(parameters('aRecords')[copyIndex('copyA')], 'ttl'), parameters('aRecords')[copyIndex('copyA')].ttl, parameters('ttlDefault'))]",
+        "ARecords": [
+          {
+            "copy": {
+              "name": "aLoop",
+              "count": "[if(contains(parameters('aRecords')[copyIndex('copyA')], 'ipv4Addresses'), length(parameters('aRecords')[copyIndex('copyA')].ipv4Addresses), 0)]",
+              "input": {
+                "ipv4Address": "[parameters('aRecords')[copyIndex('copyA')].ipv4Addresses[copyIndex('aLoop')]]"
+              }
+            }
+          }
+        ],
+        "targetResource": "[if(contains(parameters('aRecords')[copyIndex('copyA')],'targetResourceId') , json(format('{{\"id\":\"{0}\"}}', parameters('aRecords')[copyIndex('copyA')].targetResourceId)), json('{}'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnszones/AAAA",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/{1}', parameters('zoneName'), parameters('aaaaRecords')[copyIndex('copyAAAA')].name)]",
+      "copy": {
+        "name": "copyAAAA",
+        "count": "[length(parameters('aaaaRecords'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[if(contains(parameters('aaaaRecords')[copyIndex('copyAAAA')], 'ttl'), parameters('aaaaRecords')[copyIndex('copyAAAA')].ttl, parameters('ttlDefault'))]",
+        "AAAARecords": [
+          {
+            "copy": {
+              "name": "aaaaLoop",
+              "count": "[if(contains(parameters('aaaaRecords')[copyIndex('copyAAAA')], 'ipv6Addresses'), length(parameters('aaaaRecords')[copyIndex('copyAAAA')].ipv6Addresses), 0)]",
+              "input": {
+                "ipv6Address": "[parameters('aaaaRecords')[copyIndex('copyAAAA')].ipv6Addresses[copyIndex('aaaaLoop')]]"
+              }
+            }
+          }
+        ],
+        "targetResource": "[if(contains(parameters('aaaaRecords')[copyIndex('copyAAAA')],'targetResourceId') , json(format('{{\"id\":\"{0}\"}}', parameters('aaaaRecords')[copyIndex('copyAAAA')].targetResourceId)), json('{}'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnszones/CNAME",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/{1}', parameters('zoneName'), parameters('cnameRecords')[copyIndex('copyCNAME')].name)]",
+      "copy": {
+        "name": "copyCNAME",
+        "count": "[length(parameters('cnameRecords'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[if(contains(parameters('cnameRecords')[copyIndex('copyCNAME')], 'ttl'), parameters('cnameRecords')[copyIndex('copyCNAME')].ttl, parameters('ttlDefault'))]",
+        "CNAMERecord": {
+          "cname": "[parameters('cnameRecords')[copyIndex('copyCNAME')].cname]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnszones/TXT",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/{1}', parameters('zoneName'), parameters('txtRecords')[copyIndex('copyTXT')].name)]",
+      "copy": {
+        "name": "copyTXT",
+        "count": "[length(parameters('txtRecords'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[if(contains(parameters('txtRecords')[copyIndex('copyTXT')], 'ttl'), parameters('txtRecords')[copyIndex('copyTXT')].ttl, parameters('ttlDefault'))]",
+        "TXTRecords": [
+          {
+            "copy": {
+              "name": "txtLoop",
+              "count": "[length(parameters('txtRecords')[copyIndex('copyTXT')].values)]",
+              "input": {
+                "value": [
+                  "[parameters('txtRecords')[copyIndex('copyTXT')].values[copyIndex('txtLoop')]]"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnszones/MX",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/{1}', parameters('zoneName'), parameters('mxRecords')[copyIndex('copyMX')].name)]",
+      "copy": {
+        "name": "copyMX",
+        "count": "[length(parameters('mxRecords'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[if(contains(parameters('mxRecords')[copyIndex('copyMX')], 'ttl'), parameters('mxRecords')[copyIndex('copyMX')].ttl, parameters('ttlDefault'))]",
+        "MXRecords": [
+          {
+            "copy": {
+              "name": "mxLoop",
+              "count": "[length(parameters('mxRecords')[copyIndex('copyMX')].exchanges)]",
+              "input": {
+                "preference": "[parameters('mxRecords')[copyIndex('copyMX')].exchanges[copyIndex('mxLoop')].preference]",
+                "exchange": "[parameters('mxRecords')[copyIndex('copyMX')].exchanges[copyIndex('mxLoop')].exchange]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnszones/NS",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/{1}', parameters('zoneName'), parameters('childNsRecords')[copyIndex('copyNS')].name)]",
+      "copy": {
+        "name": "copyNS",
+        "count": "[length(parameters('childNsRecords'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[if(contains(parameters('childNsRecords')[copyIndex('copyNS')], 'ttl'), parameters('childNsRecords')[copyIndex('copyNS')].ttl, parameters('ttlNS'))]",
+        "NSRecords": [
+          {
+            "copy": {
+              "name": "nsLoop",
+              "count": "[length(parameters('childNsRecords')[copyIndex('copyNS')].nsdnames)]",
+              "input": {
+                "nsdname": "[parameters('childNsRecords')[copyIndex('copyNS')].nsdnames[copyIndex('nsLoop')]]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "condition": "[parameters('overrideSOA')]",
+      "type": "Microsoft.Network/dnszones/SOA",
+      "apiVersion": "2023-07-01-preview",
+      "name": "[format('{0}/@', parameters('zoneName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnszones', parameters('zoneName'))]"
+      ],
+      "properties": {
+        "TTL": "[parameters('soaRecord').ttl]",
+        "SOARecord": {
+          "email": "[parameters('soaRecord').email]",
+          "expireTime": "[parameters('soaRecord').expireTime]",
+          "host": "[parameters('soaRecord').host]",
+          "minimumTTL": "[parameters('soaRecord').minimumTTL]",
+          "refreshTime": "[parameters('soaRecord').refreshTime]",
+          "retryTime": "[parameters('soaRecord').retryTime]",
+          "serialNumber": "[parameters('soaRecord').serialNumber]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
