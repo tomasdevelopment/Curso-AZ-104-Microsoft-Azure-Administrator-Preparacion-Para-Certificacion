@@ -178,3 +178,11 @@ az role assignment create --assignee "$OBJ" --role "Azure Kubernetes Service RBA
 az role assignment create --assignee "$OBJ" --role "Azure Kubernetes Service RBAC Writer" --scope "$AKS_ID"
 az role assignment create --assignee "$OBJ" --role "Azure Kubernetes Service RBAC Admin" --scope "$AKS_ID"
 az role assignment create --assignee "$OBJ" --role "Azure Kubernetes Service RBAC Cluster Admin" --scope "$AKS_ID"
+
+# ---------------------------------
+# 11) ADD A USER POOL (second occurrence — preserved to NOT lose anything)
+# ---------------------------------
+az aks nodepool add -g "$RG" --cluster-name "$AKS" \
+  -n "userpool" --mode User \
+  --node-vm-size "$SIZE" \
+  --node-count 1 || true
