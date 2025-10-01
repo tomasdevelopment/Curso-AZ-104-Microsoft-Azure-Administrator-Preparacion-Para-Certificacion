@@ -1,3 +1,33 @@
+# End-to-End Private Azure Logic Apps Deployment
+
+## Overview
+This project delivers a **secure and production-ready deployment model for Azure Logic Apps** using private networking. The architecture ensures that all traffic between the Logic Apps, connected resources, and monitoring tools flows through **Azure Private Endpoints and VNet-injected services**, eliminating public exposure.
+
+## Key Goals
+- Enable private-only integration of Logic Apps with Azure services.  
+- Automate infrastructure deployment with Bicep/ARM templates.  
+- Provide observability with Azure Monitor and Log Analytics via Private Link Scope.  
+- Support enterprise-grade DNS resolution using custom Private DNS Zones.  
+- Route traffic through Azure Application Gateway for controlled ingress.
+
+## Architecture Highlights
+- **Logic Apps Standard (ISE/consumption hybrid)** running inside a secured VNet.  
+- **Private Endpoints** for Storage, Key Vault, and other dependencies.  
+- **Private DNS Zones** with conditional forwarding rules for name resolution.  
+- **Azure Application Gateway** for controlled routing and TLS termination.  
+- **Azure Monitor + Private Link Scope** for secure metrics and diagnostics ingestion.  
+
+## Impact
+This reference implementation accelerates **enterprise adoption of private Logic Apps** by providing a repeatable, secure deployment pattern. It reduces time-to-deploy, enforces compliance, and minimizes operational risk by ensuring workloads never traverse the public internet.
+
+## Skills & Tools
+- Azure Logic Apps Standard  
+- Azure Private Endpoints & DNS  
+- Application Gateway & VNet Integration  
+- Bicep/ARM Infrastructure as Code  
+- Azure Monitor / Log Analytics  
+
+
 **Setting	Why it matters
 **
 
